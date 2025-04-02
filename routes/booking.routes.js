@@ -1,47 +1,28 @@
 import express from "express";
 import { body } from "express-validator";
+import { createBooking } from "../controllers/bookingController.js";
 import validate from "../middlewares/validate.js";
-import {
-  createBooking,
-  updateBooking,
-} from "../controllers/bookingController.js";
 
 const router = express.Router();
 
 router.post(
   "/",
   [
-    body("userId")
-      .isMongoId()
-      .withMessage("userId должен быть валидным MongoDB ObjectId"),
-    body("hotelId")
-      .isMongoId()
-      .withMessage("hotelId должен быть валидным MongoDB ObjectId"),
-    body("checkInDate")
+    body("userId").isMongoId().withMessage("Некорректный ID пользователя"),
+    body("hotelId").isMongoId().withMessage("Некорректный ID отеля"),
+    body("startDate")
       .isISO8601()
-      .withMessage("checkInDate должен быть валидной датой"),
-    body("checkOutDate")
+      .withMessage("Дата начала должна быть в формате ISO8601"),
+    body("endDate")
       .isISO8601()
-      .withMessage("checkOutDate должен быть валидной датой"),
+      .withMessage("Дата окончания должна быть в формате ISO8601"),
+    body("totalPrice")
+      .isFloat({ min: 0.01 })
+      .withMessage("Цена должна быть больше 0"),
+    validate,
   ],
-  validate,
   createBooking
 );
 
-router.patch(
-  "/:id",
-  [
-    body("checkInDate")
-      .optional()
-      .isISO8601()
-      .withMessage("checkInDate должен быть валидной датой"),
-    body("checkOutDate")
-      .optional()
-      .isISO8601()
-      .withMessage("checkOutDate должен быть валидной датой"),
-  ],
-  validate,
-  updateBooking
-);
-
 export default router;
+
